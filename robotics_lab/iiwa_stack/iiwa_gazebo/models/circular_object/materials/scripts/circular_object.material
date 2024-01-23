@@ -1,0 +1,15 @@
+material CircularObject
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture red.png
+      }
+    }
+  }
+}
+
+

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+   
+    <arg name="hardware_interface" default="PositionJointInterface" />
+    <arg name="robot_name" default="arm" />
+    <arg name="model" default="arm_model"/>
+    <arg name="trajectory" default="true"/>
+    
+    <!-- Loads the Gazebo world. -->
+    <include file="$(find arm_gazebo)/launch/arm_world.launch">
+        <arg name="hardware_interface" value="$(arg hardware_interface)" />
+        <arg name="robot_name" value="$(arg robot_name)" />
+        <arg name="model" value="$(arg model)" />
+    </include>
+    
+    
+    <!-- Spawn controllers - it uses an Position Controller for each joint -->
+    <group ns="$(arg robot_name)">
+        
+        <include file="$(find arm_control)/launch/arm_control.launch">
+            <arg name="hardware_interface" value="$(arg hardware_interface)" />
+            <arg name="controllers" value="joint_state_controller
+                 PositionJointInterface_J0_controller 	
+                 PositionJointInterface_J1_controller 
+                 PositionJointInterface_J2_controller 
+                 PositionJointInterface_J3_controller" />
+                 
+            <arg name="robot_name" value="$(arg robot_name)" />
+            <arg name="model" value="$(arg model)" />
+        </include>
+        
+    </group>
+    
+    
+</launch>
