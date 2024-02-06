@@ -1,4 +1,61 @@
 #include "../include/tf_nav.h"
+#include <tf/transform_broadcaster.h>
+
+std::vector<double> aruco_pose(7,0.0);
+bool aruco_pose_available = false;
+
+void arucoPoseCallback(const geometry_msgs::PoseStamped & msg)
+{
+    aruco_pose_available = true;
+    aruco_pose.clear();
+    aruco_pose.push_back(msg.pose.position.x);
+    aruco_pose.push_back(msg.pose.position.y);
+    aruco_pose.push_back(msg.pose.position.z);
+    aruco_pose.push_back(msg.pose.orientation.x);
+    aruco_pose.push_back(msg.pose.orientation.y);
+    aruco_pose.push_back(msg.pose.orientation.z);
+    aruco_pose.push_back(msg.pose.orientation.w);
+    
+}
+
+
+void poseCallback(const geometry_msgs::PoseStamped & msg)
+{    
+    static tf::TransformBroadcaster br;
+    tf::Transform transform;
+    transform.setOrigin( tf::Vector3(msg.pose.position.x,msg.pose.position.y,msg.pose.position.z) );
+    tf::Quaternion q;
+    q.setX(msg.pose.orientation.x);
+    q.setY(msg.pose.orientation.y);
+    q.setZ(msg.pose.orientation.z);
+    q.setW(msg.pose.orientation.w);
+    transform.setRotation(q);
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "aruco_frame"));
+}
+
+void TF_NAV::broadcast_listener() {
+    ros::Rate r( 5 );
+    tf::TransformListener listener;
+    tf::StampedTransform transform;
+    
+    while ( ros::ok() )
+    {
+        try {
+            listener.waitForTransform( "map", "aruco_frame", ros::Time(0), ros::Duration(60.0) );
+            listener.lookupTransform( "map", "aruco_frame", ros::Time(0), transform );
+ 
+        }
+        catch( tf::TransformException &ex ) {
+            ROS_ERROR("%s", ex.what());
+            r.sleep();
+            continue;
+        }
+       
+        r.sleep();
+    }
+ 
+}
+
 
 TF_NAV::TF_NAV() {
 
@@ -11,7 +68,7 @@ TF_NAV::TF_NAV() {
     
     _home_pos << -18.0, 2.0, 0.0;
     
-    goal1_pos << 0.0, 0.0, 0.0;
+    /*goal1_pos << 0.0, 0.0, 0.0;
     goal1_or << 0.0, 0.0, 0.0, 1.0;
  
     goal2_pos << 0.0, 0.0, 0.0;
@@ -22,6 +79,12 @@ TF_NAV::TF_NAV() {
  
     goal4_pos << 0.0, 0.0, 0.0;
     goal4_or << 0.0, 0.0, 0.0, 1.0;
+    
+    goal5_pos << 0.0, 0.0, 0.0;
+    goal5_or << 0.0, 0.0, 0.0, 1.0;*/
+    
+    goal6_pos << 0.0, 0.0, 0.0;
+    goal6_or << 0.0, 0.0, 0.0, 1.0;
 }
 
 void TF_NAV::tf_listener_fun() {
@@ -69,7 +132,7 @@ void TF_NAV::position_pub() {
     _position_pub.publish(pose);
 }
 
-void TF_NAV::goal1_listener() {
+/*void TF_NAV::goal1_listener() {
     ros::Rate r( 1 );
     tf::TransformListener listener;
     tf::StampedTransform transform;
@@ -207,7 +270,35 @@ void TF_NAV::goal5_listener() {
         ROS_INFO("Goal Orientation: %f %f %f %f", goal5_or[0], goal5_or[1], goal5_or[2], goal5_or[3]);
         r.sleep();
     }    
-}
+} */
+
+void TF_NAV::goal6_listener() {
+    ros::Rate r( 1 );
+    tf::TransformListener listener;
+    tf::StampedTransform transform;
+
+    while ( ros::ok() )
+    {
+        try
+        {
+            listener.waitForTransform( "map", "goal6", ros::Time( 0 ), ros::Duration( 10.0 ) );
+            listener.lookupTransform( "map", "goal6", ros::Time( 0 ), transform );
+        }
+        catch( tf::TransformException &ex )
+        {
+            ROS_ERROR("%s", ex.what());
+            r.sleep();
+            continue;
+        }
+
+        goal6_pos << transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z();
+        goal6_or << transform.getRotation().w(),  transform.getRotation().x(), transform.getRotation().y(), transform.getRotation().z();
+        
+        //ROS_INFO("Goal Position: %f %f %f", goal6_pos[0], goal6_pos[1], goal6_pos[2]);
+        //ROS_INFO("Goal Orientation: %f %f %f %f", goal6_or[0], goal6_or[1], goal6_or[2], goal6_or[3]);
+        r.sleep();
+    }    
+} 
 
 void TF_NAV::send_goal() {
     ros::Rate r( 5 );
@@ -222,7 +313,9 @@ void TF_NAV::send_goal() {
         std::cin>>cmd;
 
         if ( cmd == 1) {
-            //goal 3
+            
+        
+	   /* //goal 3
             MoveBaseClient ac1("move_base", true);
             while(!ac1.waitForServer(ros::Duration(5.0))){
             ROS_INFO("Waiting for the move_base action server to come up");
@@ -246,13 +339,13 @@ void TF_NAV::send_goal() {
             ac1.waitForResult();
 
             if(ac1.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-                ROS_INFO("Arived in the TF goal 3");
+                ROS_INFO("Arrived in the TF goal 3");
             else{
                 ROS_INFO("The base failed to move");
                 break;  
             }
-
-
+            
+            
             //goal 4
             MoveBaseClient ac2("move_base", true);
             while(!ac2.waitForServer(ros::Duration(5.0))){
@@ -276,8 +369,8 @@ void TF_NAV::send_goal() {
                 ROS_INFO("Arrived in the TF goal 4");
             else
                 ROS_INFO("The base failed to move");
-
-
+                
+                
             //goal 2
             MoveBaseClient ac3("move_base", true);
             while(!ac3.waitForServer(ros::Duration(5.0))){
@@ -301,8 +394,7 @@ void TF_NAV::send_goal() {
                 ROS_INFO("Arrived in the TF goal 2");
             else
                 ROS_INFO("The base failed to move");
-
-
+                
             //goal 1
             MoveBaseClient ac4("move_base", true);
             while(!ac4.waitForServer(ros::Duration(5.0))){
@@ -326,7 +418,7 @@ void TF_NAV::send_goal() {
                 ROS_INFO("Arrived in the TF goal 1");
             else
                 ROS_INFO("The base failed to move");
-     
+       
             //goal5
 	    MoveBaseClient ac5("move_base", true);
             while(!ac5.waitForServer(ros::Duration(5.0))){
@@ -349,7 +441,71 @@ void TF_NAV::send_goal() {
             if(ac5.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
                 ROS_INFO("Arrived in the TF goal 5");
             else
+                ROS_INFO("The base failed to move");*/
+                
+                
+            //goal6
+	    MoveBaseClient ac6("move_base", true);
+            while(!ac6.waitForServer(ros::Duration(5.0))){
+            ROS_INFO("Waiting for the move_base action server to come up");
+            }
+            goal.target_pose.header.frame_id = "map";
+            goal.target_pose.header.stamp = ros::Time::now();
+            
+            goal.target_pose.pose.position.x = goal6_pos[0];
+            goal.target_pose.pose.position.y = goal6_pos[1];
+            goal.target_pose.pose.position.z = goal6_pos[2];
+
+            goal.target_pose.pose.orientation.w = goal6_or[0];
+            goal.target_pose.pose.orientation.x = goal6_or[1];
+            goal.target_pose.pose.orientation.y = goal6_or[2];
+            goal.target_pose.pose.orientation.z = goal6_or[3];
+
+            ROS_INFO("Sending goal 6");
+            ac6.sendGoal(goal);
+
+            ac6.waitForResult();
+
+            if(ac6.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+                ROS_INFO("Arrived in the TF goal 6");
+                
+                std::cout<<"\nInsert 1 to send aruco goal "<<std::endl;
+        	 std::cout<<"Insert your choice"<<std::endl;
+        	 std::cin>>cmd;
+        	 
+        	 if(cmd == 1){
+        	 MoveBaseClient aca("move_base", true);
+            	 while(!aca.waitForServer(ros::Duration(5.0))){
+            	 ROS_INFO("Waiting for the move_base action server to come up");
+           	 }
+        	 
+        	 goal.target_pose.pose.position.x = aruco_pose[0]+1;
+            	 goal.target_pose.pose.position.y = aruco_pose[1];
+            	 goal.target_pose.pose.position.z = goal6_pos[2];
+        	 
+        	 
+        	 goal.target_pose.pose.orientation.w = goal6_or[0];
+            	 goal.target_pose.pose.orientation.x = goal6_or[1];
+                goal.target_pose.pose.orientation.y = goal6_or[2];
+                goal.target_pose.pose.orientation.z = goal6_or[3];
+                
+                ROS_INFO("Sending goal aruco");
+                aca.sendGoal(goal);
+                
+                aca.waitForResult();
+                if(ac6.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+                ROS_INFO("Arrived in the aruco goal");
+        	 
+        	 else 
+        	      ROS_INFO("The base failed to move");
+        	      
+                	}
+                }
+            else
                 ROS_INFO("The base failed to move");
+                
+            
+                
         }
         else if ( cmd == 2 ) {
             MoveBaseClient ac("move_base", true);
@@ -358,6 +514,8 @@ void TF_NAV::send_goal() {
             }
             goal.target_pose.header.frame_id = "map";
             goal.target_pose.header.stamp = ros::Time::now();
+            
+            
             
             goal.target_pose.pose.position.x = _home_pos[0];
             goal.target_pose.pose.position.y = _home_pos[1];
@@ -388,12 +546,14 @@ void TF_NAV::send_goal() {
 
 void TF_NAV::run() {
     boost::thread tf_listener_fun_t( &TF_NAV::tf_listener_fun, this );
+    boost::thread broadcast_listener_t( &TF_NAV::broadcast_listener, this );
     //boost::thread tf_listener_goal_t( &TF_NAV::goal_listener, this );
-    boost::thread tf_listener_goal1_t( &TF_NAV::goal1_listener, this );
+    /*boost::thread tf_listener_goal1_t( &TF_NAV::goal1_listener, this );
     boost::thread tf_listener_goal2_t( &TF_NAV::goal2_listener, this );
     boost::thread tf_listener_goal3_t( &TF_NAV::goal3_listener, this );
     boost::thread tf_listener_goal4_t( &TF_NAV::goal4_listener, this );
-    boost::thread tf_listener_goal5_t( &TF_NAV::goal5_listener, this );
+    boost::thread tf_listener_goal5_t( &TF_NAV::goal5_listener, this );*/
+    boost::thread tf_listener_goal6_t( &TF_NAV::goal6_listener, this );
     boost::thread send_goal_t( &TF_NAV::send_goal, this );
     ros::spin();
 }
@@ -402,6 +562,9 @@ void TF_NAV::run() {
 
 int main( int argc, char** argv ) {
     ros::init(argc, argv, "tf_navigation");
+    ros::NodeHandle n;
+    ros::Subscriber aruco_pose_sub = n.subscribe("/aruco_single/pose", 1, arucoPoseCallback);
+    ros::Subscriber aruco_pose_sub_broadcast = n.subscribe("/aruco_single/pose", 1, poseCallback);
     TF_NAV tfnav;
     tfnav.run();
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="circular">
+    <include>
+      <uri>model://circular_object</uri>
+      <pose>1 -0.5 0.6 0 0 0</pose>
+    </include>
+    <model name="circular_object">
+      <static>true</static>
+      <pose>1 -0.5 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.01</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.01</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://circular_object/materials/scripts</uri>
+              <uri>model://circular_object/materials/textures</uri>
+              <name>CircularObject/Material</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
+
+

@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 
-<robot name="arm" xmlns:xacro="http://ros.org/wiki/xacro">
-<xacro:include filename="$(find arm_description)/arm.gazebo.xacro"/>
-<xacro:include filename="$(find arm_description)/urdf/arm.transmission.xacro"/>
+<robot name="arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:include filename="$(find arm_description)/urdf/arm.gazebo.xacro" />
+<xacro:include filename="$(find arm_description)/urdf/arm.transmission.xacro" />
 
 <xacro:arg name="hardware_interface" default="PositionJointInterface"/>
 <xacro:arg name="robot_name" default="arm"/>
-
 <!-- Add a camera_link -->
 <link name="camera_link">
   <visual>
@@ -36,23 +35,26 @@
   <origin xyz="0.1 0 0" rpy="0 0 0" />
 </joint>
 
-<link name="base_link">
-    <visual>
-	<geometry>
-	    <box size="0.1 0.1 0.1"/> 
-	</geometry>
-	<origin rpy="0 0 0" xyz="0 0 0"/>
-    </visual>
-    <collision>
-	<geometry>
-	    <box size="0.1 0.1 0.1"/> 
-	</geometry>
-	<origin rpy="0 0 0" xyz="0 0 0"/>
-    </collision>
-    <inertial>
-	<mass value="0.1"/>
-	<inertia ixx="1.06682889e+08" ixy="0.0" ixz="0.0" iyy="9.92165844e+07" iyz="0.0" izz="1.26939175e+08"/>
-    </inertial>
+
+  <link name="base_link">
+  <visual>
+    <geometry>
+      <mesh filename="package://arm_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </visual>
+
+  <collision>
+    <geometry>
+      <box size="0.1 0.1 0.1"/> <!-- Replace with your desired size -->
+    </geometry>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </collision>
+
+  <inertial>
+    <mass value="0.1"/>
+    <inertia ixx="1.06682889e+08" ixy="0.0" ixz="0.0" iyy="9.92165844e+07" iyz="0.0" izz="1.26939175e+08"/>
+  </inertial>
 </link>
 
 
@@ -61,8 +63,8 @@
     <child link="base_turn"/>
     <origin xyz="-0.0011 -0.011 0.05"/>
   </joint>
-  
-<link name="base_turn">
+
+  <link name="base_turn">
     <visual>
       <geometry>
         <mesh filename="package://arm_description/meshes/base_turn.stl" scale="0.001 0.001 0.001"/>
@@ -88,6 +90,8 @@
     <axis xyz="0 0 1" />
     <limit effort="300" velocity="0.1" lower="-2.57" upper="2.57"/>
   </joint>
+  
+ 
   <link name="base_turn_rot">
     <visual>
       <geometry>
@@ -435,8 +439,7 @@
   </link>
 
 
-<xacro:arm_gazebo/>
+<xacro:arm_gazebo_tags />
 <xacro:arm_transmission hardware_interface="$(arg hardware_interface)" robot_name="$(arg robot_name)"/>
 
-   
 </robot>

@@ -111,10 +111,10 @@
     <model name='aruco_marker'>
       <link name='link'>
         <visual name='front_visual'>
-          <pose>5e-05 0 0 0 -0 0</pose>
+          <pose>0 0 0 0 0 0</pose>
           <geometry>
             <box>
-              <size>0.0001 0.15 0.15</size>
+              <size>0.001 0.10 0.10</size>
             </box>
           </geometry>
           <material>
@@ -126,18 +126,18 @@
           </material>
         </visual>
         <visual name='rear_visual'>
-          <pose>-5e-05 0 0 0 -0 0</pose>
+          <pose>-0.0005 0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>0.0001 0.15 0.15</size>
+              <size>0.001 0.10 0.10</size>
             </box>
           </geometry>
         </visual>
         <collision name='collision'>
-          <pose>0 0 0 0 -0 0</pose>
+          <pose>-0.0005 0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>0.0001 0.15 0.15</size>
+              <size>0.001 0.10 0.10</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -170,23 +170,13 @@
           <mass>1</mass>
         </inertial>
       </link>
-      <pose>2 0 0.15 0 -0 -3.14</pose>
+      <pose>1 -0.3 0.5 0 0 -3.14</pose>
     </model>
     <state world_name='default'>
       <sim_time>61 770000000</sim_time>
       <real_time>62 776290418</real_time>
       <wall_time>1700779185 732008014</wall_time>
       <iterations>6177</iterations>
-      <model name='aruco_marker'>
-        <pose>0.422325 -0.002513 1.3065 0 0 -3.14</pose>
-        <scale>1 1 1</scale>
-        <link name='link'>
-          <pose>0.422325 -0.002513 1.3065 0 0 -3.14</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 -9.8 0 -0 0</acceleration>
-          <wrench>0 0 -9.8 0 -0 0</wrench>
-        </link>
-      </model>
       <model name='ground_plane'>
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>

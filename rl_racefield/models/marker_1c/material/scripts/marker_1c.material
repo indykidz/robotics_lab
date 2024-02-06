@@ -6,7 +6,9 @@ material marker_1c
 		{
 			texture_unit
 			{
-				texture 1c).png
+				texture aruco.png
+				filtering anisotropic
+        			max_anisotropy 16
 			}
 		}
 	}

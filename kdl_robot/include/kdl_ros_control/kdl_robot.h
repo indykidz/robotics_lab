@@ -51,6 +51,10 @@ public:
     KDL::ChainIkSolverPos_NR_JL* ikSol_;
     KDL::JntArray getInvKin(const KDL::JntArray &q,
                             const KDL::Frame &eeFrame);
+    
+    KDL::JntArray getInvKinVel(const KDL::JntArray &qd,
+                        const KDL::Twist &eeFrameVel);
+                        
     // end-effector
     KDL::Frame getEEFrame();
     KDL::Frame getFlangeEE();
@@ -59,6 +63,7 @@ public:
     KDL::Jacobian getEEJacobian();
     KDL::Jacobian getEEBodyJacobian();
     Eigen::VectorXd getEEJacDotqDot();
+    Eigen::VectorXd getEEJacDotqDot_red();
 
     void getInverseKinematics(KDL::Frame &f,
                               KDL::Twist &twist,

@@ -1,5 +1,4 @@
-#iiwa:
-  # Publish all joint states -----------------------------------
+ # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
     publish_rate: 50  
@@ -22,4 +21,4 @@
   PositionJointInterface_J3_controller:
     type: position_controllers/JointPositionController
     joint: j3
- 
+    

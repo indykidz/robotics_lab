@@ -12,12 +12,14 @@ class TF_NAV {
         TF_NAV();
         void run();
         void tf_listener_fun();
-        void position_pub();
-        void goal1_listener();
+        void position_pub();        
+        void broadcast_listener();
+        /*void goal1_listener();
         void goal2_listener();
         void goal3_listener();
         void goal4_listener();
-        void goal5_listener();
+        void goal5_listener();*/
+        void goal6_listener();
         void send_goal();
 
     private:
@@ -25,6 +27,7 @@ class TF_NAV {
         ros::NodeHandle _nh;
 
         ros::Publisher _position_pub;
+        ros::Publisher _aruco_position_pub;
 
         Eigen::Vector3d _home_pos;
 
@@ -35,7 +38,7 @@ class TF_NAV {
         Eigen::Vector4d _goal_or;
         typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
         
-         Eigen::Vector3d goal1_pos;
+         /*Eigen::Vector3d goal1_pos;
          Eigen::Vector4d goal1_or;
          
          Eigen::Vector3d goal2_pos;
@@ -48,6 +51,9 @@ class TF_NAV {
          Eigen::Vector4d goal4_or;     
          
          Eigen::Vector3d goal5_pos;
-         Eigen::Vector4d goal5_or; 
+         Eigen::Vector4d goal5_or;*/ 
+         
+         Eigen::Vector3d goal6_pos;
+         Eigen::Vector4d goal6_or; 
 
 };

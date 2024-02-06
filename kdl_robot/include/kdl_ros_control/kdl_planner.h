@@ -41,24 +41,23 @@ public:
 
     KDL::Trajectory* getTrajectory();
     
-    void trapezoidal_vel(double t, double tc, double &s, double &ds, double &dds);
+    void trapezoidal_vel(double time, double &s, double &ds,double &dds);
     void cubic_polinomial(double t, double& s, double& ds, double& dds) const;
                
     //linear trajectory with trapezoidal velocity
-    KDLPlanner(double _trajDuration, double _accDuration,
-       Eigen::Vector3d _trajInit, Eigen::Vector3d _trajEnd);
-       
-    //linear trajectory with cubic polinomial
-    KDLPlanner(double _trajDuration,
-       Eigen::Vector3d _trajInit, Eigen::Vector3d _trajEnd);
-      
-    //circular trajectory with trapezoidal velocity
-    KDLPlanner(double _trajDuration, double _accDuration,
-       Eigen::Vector3d _trajInit, double _trajRadius);
-       
-    //circular trajectory with cubic polinomial
     KDLPlanner(double _trajDuration, 
-    Eigen::Vector3d _trajInit, double _trajRadius);
+    		double _accDuration,
+    		Eigen::Vector3d _trajInit, 
+    		Eigen::Vector3d _trajEnd);
+    		
+    //circular trajectory
+    KDLPlanner(double _trajDuration, 
+    			double _accDuration, 
+    			Eigen::Vector3d _trajInit, 
+    			Eigen::Vector3d _trajEnd, 
+    			double _trajRadius);
+    			
+       
         
     trajectory_point compute_trajectory_cubic_circular(double time);
     trajectory_point compute_trajectory_trap_circular(double time);

@@ -145,9 +145,9 @@
 
     <!-- AR markers -->
     <include>
-      <name>tool_0_tag</name>
+      <name>marker_1c</name>
       <uri>model://marker_1c</uri>
-      <pose>-17 8 0.2 0 1.57 3.14</pose>
+      <pose>-17 9 0.3 0 0 0</pose>
     </include>
     
   

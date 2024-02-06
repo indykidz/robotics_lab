@@ -5,6 +5,9 @@
 #include "kdl/jacobian.hpp"
 #include "Eigen/Dense"
 #include <iostream>
+#include "Eigen/Core"
+#include <Eigen/Dense>
+#include <cmath>
 
 inline KDL::Vector toKDL(const Eigen::Vector3d& v)
 {
@@ -38,6 +41,15 @@ inline Eigen::MatrixXd toEigen(const std::vector<Eigen::Matrix<double,3,7>>& J)
     }
     return Ja;
 }
+
+
+inline Eigen::VectorXd toEigen(std::vector<double>& v)
+{
+    Eigen::Map<Eigen::VectorXd> ve(&v[0], v.size());
+    return ve;
+}
+
+
 
 inline Eigen::Vector3d toEigen(const KDL::Vector& v)
 {
@@ -192,6 +204,74 @@ inline Eigen::Matrix<double,3,1> computeOrientationError(const Eigen::Matrix<dou
     return e_o;
 }
 
+inline double computeJointErrorNorm(const Eigen::Matrix<double,-1,1> &_jnt_d,
+                                    const Eigen::Matrix<double,-1,1> &_jnt_e)
+{
+    return (_jnt_d - _jnt_e).norm();
+}
+
+
+
+inline Eigen::Matrix<double,3,1> computeEulerAngles(const Eigen::Matrix<double,3,3> &_R)
+{
+Eigen::Matrix<double,3,1> euler;
+//scegliamo di utilizzare gli angoli di eulero ZYZ
+double r13=_R(0,2);
+double r23=_R(1,2);
+double r31=_R(2,0);
+double r32=_R(2,1);
+double r33=_R(2,2);
+
+double phi=atan2(r23,r13);
+double theta=atan2(sqrt(r13*r13+r23*r23),r33);
+double psi=atan2(r32,-r31);
+//effective angles
+euler(0,0)=phi;
+euler(1,0)=theta;
+euler(2,0)=psi;
+return euler; 
+}
+
+
+inline Eigen::Matrix<double,3,1> computeOrientationErrorEuler(const Eigen::Matrix<double,3,3> &_R_d, 
+                                                         const Eigen::Matrix<double,3,3> &_R_e)
+{
+Eigen::Matrix<double,3,1> e_phi;
+
+//desidered angles
+Eigen::Matrix<double,3,1> phi_d=computeEulerAngles(_R_d);
+//effective angles
+Eigen::Matrix<double,3,1> phi_e=computeEulerAngles(_R_e);
+e_phi=phi_d-phi_e;
+return e_phi; 
+}
+
+
+inline Eigen::Matrix<double,3,3> T_matrix(const Eigen::Matrix<double,3,1> &euler){
+double phi=euler(0,0);
+ double theta=euler(1,0);
+  Eigen::Matrix<double,3,3> T;
+ T(0,0) = 0;
+ T(0,1) = -sin(phi);
+ T(0,2) = cos(phi)*sin(theta);
+ T(1,0) = 0;
+ T(1,1) = cos(phi);
+ T(1,2) = sin(phi)*sin(theta);
+ T(2,0)= 1;
+ T(2,1)= 0;
+ T(2,2)= cos(theta);
+    return T;
+}
+
+inline  Eigen::Matrix<double,6,7> AnalitycalJacobian( const Eigen::Matrix<double,6,7> &J,const Eigen::Matrix<double,3,1> &euler){
+
+ Eigen::Matrix<double,6,6> TA=Eigen::MatrixXd::Zero(6,6);
+TA.block(0,0,3,3) = Eigen::Matrix3d::Identity();
+TA.block(3,3,3,3) = T_matrix(euler);
+ return TA.inverse()*J;
+}
+
+
 inline Eigen::Matrix<double,3,1> computeLinearError(const Eigen::Matrix<double,3,1> &_p_d,
                                                     const Eigen::Matrix<double,3,1> &_p_e)
 {
@@ -207,6 +287,22 @@ inline Eigen::Matrix<double,3,1> computeOrientationVelocityError(const Eigen::Ma
                               skew(_R_d.col(1))*skew(_R_e.col(1)) +
                               skew(_R_d.col(2))*skew(_R_e.col(2)));
     return L.inverse()*(L.transpose()*_omega_d - L*_omega_e);
+}
+
+inline Eigen::Matrix<double,3,1> computeOrientationVelocityErrorEuler(const Eigen::Matrix<double,3,1> &_omega_d,
+                                                                 const Eigen::Matrix<double,3,1> &_omega_e,
+                                                                 const Eigen::Matrix<double,3,3> &_R_d,
+                                                                 const Eigen::Matrix<double,3,3> &_R_e)
+{
+//desidered angles
+Eigen::Matrix<double,3,1> phi_d=computeEulerAngles(_R_d);
+//effective angles
+Eigen::Matrix<double,3,1> phi_e=computeEulerAngles(_R_e);
+Eigen::Matrix<double,3,3> Te=T_matrix(phi_e);
+Eigen::Matrix<double,3,3> Td=T_matrix(phi_d);
+Eigen::Matrix<double,3,1> dphi_d=Td.inverse()*_omega_d;
+Eigen::Matrix<double,3,1> dphi_e=Te.inverse()*_omega_e;
+return dphi_d-dphi_e;
 }
 
 

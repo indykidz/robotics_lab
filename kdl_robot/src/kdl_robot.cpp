@@ -58,7 +58,8 @@ void KDLRobot::update(std::vector<double> _jnt_values, std::vector<double> _jnt_
     fkVelSol_->JntToCart(jntVel, s_Fv_f);
     s_T_f = s_Fv_f.GetTwist();
     s_F_f = s_Fv_f.GetFrame();
-    int err = jacSol_->JntToJac(jntArray_, s_J_f);
+    int err = fkSol_->JntToCart(jntArray_,s_F_f);
+    err = jacSol_->JntToJac(jntArray_, s_J_f);
     err = jntJacDotSol_->JntToJacDot(jntVel, s_J_dot_q_dot_f);
     err = jntJacDotSol_->JntToJacDot(jntVel, s_J_dot_f);
 
@@ -173,6 +174,19 @@ KDL::JntArray KDLRobot::getInvKin(const KDL::JntArray &q,
     jntArray_out_.resize(chain_.getNrOfJoints());
     int err = ikSol_->CartToJnt(q, eeFrame, jntArray_out_);
     if (err != 0)
+    {
+        printf("inverse kinematics failed with error: %d \n", err);
+    }
+    return jntArray_out_;
+}
+
+KDL::JntArray KDLRobot::getInvKinVel(const KDL::JntArray &qd,
+                        const KDL::Twist &eeFrameVel)
+{
+    KDL::JntArray jntArray_out_;
+    jntArray_out_.resize(chain_.getNrOfJoints());
+    int err = ikVelSol_->CartToJnt(qd, eeFrameVel, jntArray_out_);
+    if (err != 0)// cartToJnt scrive in jntArray_out_come parametro I/O, il ritorno è la gestione dell'errore soltanto
     {
         printf("inverse kinematics failed with error: %d \n", err);
     }

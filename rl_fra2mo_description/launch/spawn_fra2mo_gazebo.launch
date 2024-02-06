@@ -7,17 +7,14 @@
   <arg name="gui" default="true"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
-  
-  <!--desired positions for 1a) -->
-  <arg name="x" default="-3.0"/>
-  <arg name="y" default="5.0"/>
-  <arg name="z" default="0.1"/>
- 
-  <arg name="yaw" default="-1.57"/>
+  <arg name="x_pos" default="-18.0"/>
+  <arg name="y_pos" default="2.0"/>
+  <arg name="z_pos" default="0.0"/>
   <env name="GAZEBO_MODEL_PATH" value="$(find rl_racefield)/models:$(optenv GAZEBO_MODEL_PATH)"/>
 
   <!-- We resume the logic in empty_world.launch -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find rl_racefield)/worlds/rl_race_field.world" />
     <arg name="debug" value="$(arg debug)" />
     <arg name="gui" value="$(arg gui)" />
     <arg name="paused" value="$(arg paused)"/>
@@ -32,14 +29,8 @@
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-urdf -model fra2mo -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw) -param robot_description"/> 
+	args="-urdf -model fra2mo -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description"/> 
 
-<!--Static tf publishers-->
-<node pkg="tf" type="static_transform_publisher" name="goal1_pub" args="-10 1 0 0 0 0 3 map goal1 100" />
-<node pkg="tf" type="static_transform_publisher" name="goal2_pub" args="-15 7 0 0 0 0.259 0.966 map goal2 100" />
-<node pkg="tf" type="static_transform_publisher" name="goal3_pub" args="-6 8 0 0 0 1 0 map goal3 100" />
-<node pkg="tf" type="static_transform_publisher" name="goal4_pub" args="-17.5 3 0 0 0 0.609 0.793 map goal4 100" />
-<node pkg="tf" type="static_transform_publisher" name="goal5_pub" args="-8.7 0 0 0 3 1 map goal5 100" />
 
 <!-- GUI Controls -->
 <node pkg="rqt_robot_steering" type="rqt_robot_steering"  name="Pilot" />  <!-- Uncomment if you want to use robot_steering -->
@@ -47,6 +38,24 @@
 <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />   -->
 <!-- RVIZ  -->
-<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rl_fra2mo_description)/conf/fra2mo_conf.rviz" required="true" /> -->
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rl_fra2mo_description)/conf/fra2mo_conf_map.rviz" required="true" />
+
+<!--Static tf publisher for goal1-->
+<!--node pkg="tf" type="static_transform_publisher" name="goal1_pub" args="-6 8 0 0 0 1 0 map goal1 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal2_pub" args="-4 7 0 0 0 0 1 map goal2 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal3_pub" args="-18 9.5 0 0 0 0.259 0.966 map goal3 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal4_pub" args="-12 4.3 0 0 0 0.609 0.793 map goal4 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal5_pub" args="-1 2 0 0 0 0 1 map goal5 100" /-->
+
+
+
+<node pkg="tf" type="static_transform_publisher" name="goal1_pub" args="-4 0.2 0 0 0 0 1 map goal1 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal2_pub" args="-1.5 4 0 0 0 0 1 map goal2 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal3_pub" args="-6 8 0 0 0 1 0 map goal3 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal4_pub" args="-19.5 9.5 0 0 0 0.259 0.966 map goal4 100" />
+<node pkg="tf" type="static_transform_publisher" name="goal5_pub" args="-2 9.5 0 0 0 0 1 map goal5 100" />
+
+<!--goal near aruco-->
+<node pkg="tf" type="static_transform_publisher" name="goal6_pub" args="-15.5 7.5 0 0 0 1 0 map goal6 100" />
 
 </launch>

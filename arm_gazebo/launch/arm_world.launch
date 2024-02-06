@@ -27,19 +27,5 @@
         <arg name="headless" value="$(arg headless)"/>
     </include>
     
-    
-    <!-- Run a python script to send a service call to gazebo_ros to spawn a URDF robot -->
-    <!--node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-          args="-urdf -model arm -param robot_description"/-->
-
-  <!-- Start Gazebo's ROS interface without specifying a world file -->
-  <!-- <node name="gazebo_ros" pkg="gazebo_ros" type="gazebo" respawn="false" output="screen" required="true" />-->
-
-  <!-- Load your robot's controller configuration -->
-  <!--<param name="robot_description" textfile="$(find arm_description)/urdf/arm.urdf.xacro" />-->
-
-  <!-- Load controllers -->
-  <!--<include file="$(find arm_gazebo)/launch/arm_controllers.launch" />-->
-</launch>
-
+ </launch>
 

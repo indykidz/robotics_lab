@@ -25,6 +25,8 @@
         <arg name="model" value="$(arg model)" />
     </include>
     
+    
+    
     <!-- Spawn controllers - it uses a JointTrajectoryController -->
     <group  ns="$(arg robot_name)" if="$(arg trajectory)">
         
